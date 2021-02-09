@@ -24,22 +24,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "usbd_hid.h"
+#include "Keyboard.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct
-{
-	uint8_t MODIFIER;
-	uint8_t RESERVED;
-	uint8_t KEYCODE1;
-	uint8_t KEYCODE2;
-	uint8_t KEYCODE3;
-	uint8_t KEYCODE4;
-	uint8_t KEYCODE5;
-	uint8_t KEYCODE6;
-} keyboardHID;
+
 
 /* USER CODE END PTD */
 
@@ -56,8 +46,7 @@ typedef struct
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-extern USBD_HandleTypeDef hUsbDeviceFS;
-keyboardHID keyboardhid = {0,0,0,0,0,0,0,0};
+
 
 /* USER CODE END PV */
 
@@ -116,17 +105,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  keyboardhid.MODIFIER = 0x02;  // left Shift
-	  keyboardhid.KEYCODE1 = 0x04;  // press 'a'
-	  keyboardhid.KEYCODE2 = 0x05;  // press 'b'
-	  USBD_HID_SendReport(&hUsbDeviceFS, &keyboardhid, sizeof (keyboardhid));
-	  HAL_Delay (50);
+	  DELAY_MS(1000);
+	  Keyboard_write("Hello World!!\n");
+	  DELAY_MS(1000);
+	  Keyboard_write("Good bye Cruel World!!\n");
 
-	  keyboardhid.MODIFIER = 0x00;  // shift release
-	  keyboardhid.KEYCODE1 = 0x00;  // release key
-	  keyboardhid.KEYCODE2 = 0x00;  // release key
-	  USBD_HID_SendReport(&hUsbDeviceFS, &keyboardhid, sizeof (keyboardhid));
-	  HAL_Delay (1000);
   }
   /* USER CODE END 3 */
 }

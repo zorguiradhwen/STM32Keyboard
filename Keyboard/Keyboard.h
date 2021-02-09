@@ -29,23 +29,25 @@ typedef struct
 	};
 }KeyboardHID;
 
+
+
 typedef struct KeyMap_s
 {
 	char ascii_char;
 	struct
 	{
 		uint8_t key;
-		uint8_t modifier;
+		uint8_t shift;
 	};
 }KeyMap;
 
-
+#define SHIFT (0x02)
 
 
 //void begin(void);
 //void end(void);
 ////size_t write(uint8_t k);
-//size_t write(const uint8_t *buffer, size_t size);
+size_t Keyboard_write(const uint8_t *buffer/*, size_t size*/);
 //size_t press(uint8_t k);
 //size_t release(uint8_t k);
 //void releaseAll(void);
