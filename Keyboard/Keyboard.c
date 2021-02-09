@@ -138,28 +138,78 @@ static const KeyMap ascii2key_map[] =
 	{124, 0x31, SHIFT},   // |	(vertical-bar, vbar, vertical line or vertical slash)
 	{125, 0x30, SHIFT},    // }	(curly brackets or braces)
 	{126, 0x35, SHIFT},    // ~	(Tilde ; swung dash)
-	{127, 0x4c, 0x00 },
+	{127, 0x4c, 0x00 }	   // DEL
 };
 
-static KeyboardHID report = {0};
+static Keyboard keyboard;
 
-size_t Keyboard_write(const uint8_t *buffer/*, size_t size*/)
+extern UsbHandlerTypedef USB_HANDLER;
+
+_Bool Keyboard_init(void)
 {
+	memset(keyboard.report.raw, 0x00, KEYBOARD_REPORT_SIZE);
+	keyboard.speed = KEYBOARD_DEFAULT_PRESS_SPEED;
+	keyboard.usb_handler = &USB_HANDLER;
+	return 1u;
+}
 
+size_t Keyboard_write(const char *buffer)
+{
+	_Bool result = 1u;
 	uint16_t i = 0u;
 	for (i = 0u; i<strlen((char*)buffer); i++)
 	{
-		report.KEYCODE1 = ascii2key_map[buffer[i]].key;
-		report.MODIFIER = ascii2key_map[buffer[i]].shift;
-		USB_HID_SEND_REPORT(&UsbHandler, report.report, 8u);
-		DELAY_MS(KEY_SPEED);
-		report.KEYCODE1 = KEY_NONE;
-		report.MODIFIER = KEY_NONE;
-		USB_HID_SEND_REPORT(&UsbHandler, report.report, 8u);
-		DELAY_MS(KEY_SPEED);
+		keyboard.report.KEYCODE1 = ascii2key_map[(uint8_t)buffer[i]].key;
+		keyboard.report.MODIFIER = ascii2key_map[(uint8_t)buffer[i]].shift;
+		if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
+			{result = 1u;}	else	{result = 0u;}
+		KEYBOARD_DELAY(keyboard.speed);
+		keyboard.report.KEYCODE1 = KEY_NONE;
+		keyboard.report.MODIFIER = KEY_NONE;
+		if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
+			{result = 1u;}	else	{result = 0u;}
+		KEYBOARD_DELAY(keyboard.speed);
 	}
 	return i;
 }
+
+_Bool Keyboard_releaseAll(void)
+{
+	_Bool result = 1u;
+	memset(keyboard.report.raw, 0x00, KEYBOARD_REPORT_SIZE);
+	if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
+		{result = 1u;}	else	{result = 0u;}
+	KEYBOARD_DELAY(keyboard.speed);
+	return result;
+}
+
+_Bool Keyboard_shortcut(const uint8_t modifier1, const uint8_t modifier2, const uint8_t keycode)
+{
+	_Bool result = 1u;
+	// TODO : check for integrity of modifiers ex can t press 2 shifts at the same time
+	keyboard.report.KEYCODE1 = keycode;
+	keyboard.report.MODIFIER = modifier1|modifier2;
+	if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
+		{result = 1u;}	else	{result = 0u;}
+	KEYBOARD_DELAY(keyboard.speed);
+	keyboard.report.KEYCODE1 = KEY_NONE;
+	keyboard.report.MODIFIER = KEY_NONE;
+	if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
+		{result = 1u;}	else	{result = 0u;}
+	KEYBOARD_DELAY(keyboard.speed);
+
+	return result;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

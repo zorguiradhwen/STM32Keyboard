@@ -9,16 +9,18 @@
 #define KEYBOARD_CONF_H_
 
 #include "usbd_hid.h"
-#include "main.h"
+
+// include HARDWARE ABSTARCTION LIBRARY IN CURRENT PLATFORM
+#include "main.h" // for stm32 toolchain, main.h contains all necessary includes for the hardware
+
 
 
 #define USB_HID_SEND_REPORT(handler, report, size) USBD_HID_SendReport(handler, report, size)
-#define UsbHandler hUsbDeviceFS
-#define UsbHandlerTypedef USBD_HandleTypeDef
+#define USB_HANDLER hUsbDeviceFS
+typedef USBD_HandleTypeDef UsbHandlerTypedef;
 
-extern UsbHandlerTypedef UsbHandler;
-#define DELAY_MS(a)	HAL_Delay(a)
+#define KEYBOARD_DELAY(a)	HAL_Delay(a)
 
-#define KEY_SPEED 15
+#define KEYBOARD_DEFAULT_PRESS_SPEED 15 //
 
 #endif /* KEYBOARD_CONF_H_ */
