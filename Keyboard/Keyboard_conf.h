@@ -8,14 +8,14 @@
 #ifndef KEYBOARD_CONF_H_
 #define KEYBOARD_CONF_H_
 
-#include "usbd_hid.h"
+#include "usbd_customhid.h"
 
 // include HARDWARE ABSTARCTION LIBRARY IN CURRENT PLATFORM
 #include "main.h" // for stm32 toolchain, main.h contains all necessary includes for the hardware
 
 
 
-#define USB_HID_SEND_REPORT(handler, report, size) USBD_HID_SendReport(handler, report, size)
+#define USB_HID_SEND_REPORT(handler, report, size) USBD_CUSTOM_HID_SendReport(handler, report, size)
 #define USB_HANDLER hUsbDeviceFS
 typedef USBD_HandleTypeDef UsbHandlerTypedef;
 
