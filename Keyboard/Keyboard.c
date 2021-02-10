@@ -9,7 +9,7 @@
 #include "Keyboard.h"
 #include <string.h>
 
-static const KeyMap ascii2key_map[] =
+static const KeyMap ascii2key_map[] = \
 {
 	{0	, 0x00, 0x00 },	  // NULL	(Null character)
 	{1	, 0x00, 0x00 },   // SOH	(Start of Header)
@@ -156,18 +156,19 @@ _Bool Keyboard_init(void)
 size_t Keyboard_write(const char *buffer)
 {
 	_Bool result = 1u;
+	UNUSED(result);
 	uint16_t i = 0u;
 	for (i = 0u; i<strlen((char*)buffer); i++)
 	{
 		keyboard.report.KEYCODE1 = ascii2key_map[(uint8_t)buffer[i]].key;
 		keyboard.report.MODIFIER = ascii2key_map[(uint8_t)buffer[i]].shift;
 		if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
-			{result = 1u;}	else	{result = 0u;}
+			{result &= 1u;}	else	{result &= 0u;}
 		KEYBOARD_DELAY(keyboard.speed);
 		keyboard.report.KEYCODE1 = KEY_NONE;
 		keyboard.report.MODIFIER = KEY_NONE;
 		if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
-			{result = 1u;}	else	{result = 0u;}
+			{result &= 1u;}	else	{result &= 0u;}
 		KEYBOARD_DELAY(keyboard.speed);
 	}
 	return i;
@@ -178,7 +179,7 @@ _Bool Keyboard_releaseAll(void)
 	_Bool result = 1u;
 	memset(keyboard.report.raw, 0x00, KEYBOARD_REPORT_SIZE);
 	if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
-		{result = 1u;}	else	{result = 0u;}
+		{result &= 1u;}	else	{result &= 0u;}
 	KEYBOARD_DELAY(keyboard.speed);
 	return result;
 }
@@ -190,16 +191,33 @@ _Bool Keyboard_shortcut(const uint8_t modifier1, const uint8_t modifier2, const 
 	keyboard.report.KEYCODE1 = keycode;
 	keyboard.report.MODIFIER = modifier1|modifier2;
 	if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
-		{result = 1u;}	else	{result = 0u;}
+		{result &= 1u;}	else	{result &= 0u;}
 	KEYBOARD_DELAY(keyboard.speed);
 	keyboard.report.KEYCODE1 = KEY_NONE;
 	keyboard.report.MODIFIER = KEY_NONE;
 	if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
-		{result = 1u;}	else	{result = 0u;}
+		{result &= 1u;}	else	{result &= 0u;}
 	KEYBOARD_DELAY(keyboard.speed);
 
 	return result;
 }
+
+
+_Bool  Keyboard_press(const uint8_t keycode)
+{
+	_Bool result = 1u;
+	keyboard.report.KEYCODE1 = keycode;
+	keyboard.report.MODIFIER = KEY_NONE;
+	if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
+		{result &= 1u;}	else	{result &= 0u;}
+	KEYBOARD_DELAY(keyboard.speed);
+	keyboard.report.KEYCODE1 = KEY_NONE;
+	if(!USB_HID_SEND_REPORT(keyboard.usb_handler, keyboard.report.raw, KEYBOARD_REPORT_SIZE))
+		{result &= 1u;}	else	{result &= 0u;}
+	KEYBOARD_DELAY(keyboard.speed);
+	return result;
+}
+
 
 
 

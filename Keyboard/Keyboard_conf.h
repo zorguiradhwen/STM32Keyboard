@@ -8,6 +8,8 @@
 #ifndef KEYBOARD_CONF_H_
 #define KEYBOARD_CONF_H_
 
+
+
 #include "usbd_customhid.h"
 
 // include HARDWARE ABSTARCTION LIBRARY IN CURRENT PLATFORM
