@@ -23,6 +23,6 @@ typedef USBD_HandleTypeDef UsbHandlerTypedef;
 
 #define KEYBOARD_DELAY(a)	HAL_Delay(a)
 
-#define KEYBOARD_DEFAULT_PRESS_SPEED 15 //
+#define KEYBOARD_DEFAULT_PRESS_SPEED 20 //
 
 #endif /* KEYBOARD_CONF_H_ */
